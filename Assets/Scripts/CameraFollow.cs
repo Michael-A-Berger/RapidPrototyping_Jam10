@@ -6,6 +6,8 @@ public class CameraFollow : MonoBehaviour
 {
     // Public Properties
     public GameObject objectToFollow;
+    [Range(0, 1)]
+    public float lerpPrecentage = 0.2f;
 
     // Private Properties
     private Camera main;
@@ -20,6 +22,6 @@ public class CameraFollow : MonoBehaviour
     void Update()
     {
         Vector3 newPos = new Vector3(objectToFollow.transform.position.x, objectToFollow.transform.position.y, main.transform.position.z);
-        main.transform.position = Vector3.Lerp(transform.position, newPos, 0.2f);
+        main.transform.position = Vector3.Lerp(transform.position, newPos, lerpPrecentage);
     }
 }
