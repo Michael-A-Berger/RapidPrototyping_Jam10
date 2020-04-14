@@ -7,7 +7,7 @@ public class Credits : MonoBehaviour
 {
     public void back()
     {
-        SceneManager.LoadScene(0);
+        SceneManager.LoadScene("Menu");
     }
 
     public void resources_DawnLike()

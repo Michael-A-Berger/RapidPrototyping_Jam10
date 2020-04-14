@@ -7,12 +7,12 @@ public class Menu : MonoBehaviour
 {
     public void Play()
     {
-        SceneManager.LoadScene("Scenes/test_platforming", LoadSceneMode.Single);
+        SceneManager.LoadScene("test_platforming", LoadSceneMode.Single);
     }
 
     public void Credits()
     {
-        SceneManager.LoadScene("Scenes/Credits", LoadSceneMode.Single);
+        SceneManager.LoadScene("Credits", LoadSceneMode.Single);
     }
 
     public void Quit()
