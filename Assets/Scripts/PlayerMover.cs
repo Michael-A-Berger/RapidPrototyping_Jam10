@@ -31,7 +31,7 @@ public class PlayerMover : MonoBehaviour
     private uint jumpCounter = 0;
     private GameObject spawnedWand;
     private StaffTrigger wandScript;
-    private Vector3 wandSpawnLocation;
+    private Vector3 wandSpawnLocation = new Vector3(1, 0, 0);
     private bool grounded = false;
 
     /// <summary>
@@ -101,14 +101,12 @@ public class PlayerMover : MonoBehaviour
         }
 
         // Calculating the deceleration multiplier
-        // decelTime = (grounded) ? currentGroundedTimeToStop : currentAirborneTimeToStop;
         decelTime = (grounded) ? currentMoveVars.groundedTimeToStop : currentMoveVars.airborneTimeToStop;
 
         // Running
         if (axisX != 0f)
         {
             // Calculating the add velocity factor
-            // float addVelocityX = axisX * currentMaxRunSpeed * (Time.deltaTime / currentTimeToMaxSpeed);
             float addVelocityX = axisX * currentMoveVars.maxRunSpeed * (Time.deltaTime / currentMoveVars.timeToMaxSpeed);
 
             // Creating the move vector
@@ -121,16 +119,13 @@ public class PlayerMover : MonoBehaviour
                 moveVector = new Vector2(addVelocityX, 0f);
 
             // IF the velocity and move vectors are different OR the new velocity does not exceed the max velocity...
-            // if (rigid.velocity.x / Mathf.Abs(rigid.velocity.x) != axisX || (rigid.velocity + moveVector).magnitude < currentMaxRunSpeed)
             if (rigid.velocity.x / Mathf.Abs(rigid.velocity.x) != axisX || (rigid.velocity + moveVector).magnitude < currentMoveVars.maxRunSpeed)
             {
                 rigid.velocity += moveVector;
             }
             // ELSE IF the current velocity is less than the max...
-            // else if (rigid.velocity.magnitude < currentMaxRunSpeed)
             else if (rigid.velocity.magnitude < currentMoveVars.maxRunSpeed)
             {
-                // rigid.velocity = rigid.velocity.normalized * currentMaxRunSpeed;
                 rigid.velocity = rigid.velocity.normalized * currentMoveVars.maxRunSpeed;
             }
         }
@@ -142,7 +137,6 @@ public class PlayerMover : MonoBehaviour
             if (grounded)
             {
                 // Calculate the deceleration vector
-                // Vector2 decelVector = (Time.deltaTime / decelTime) * rigid.velocity.normalized * currentMaxRunSpeed;
                 Vector2 decelVector = (Time.deltaTime / decelTime) * rigid.velocity.normalized * currentMoveVars.maxRunSpeed;
 
                 // IF the deceleration vector is LESS than the current velocity...
@@ -155,7 +149,6 @@ public class PlayerMover : MonoBehaviour
             else
             {
                 // Calulate the deceleration vector X value
-                // float decelX = (Time.deltaTime / decelTime) * (rigid.velocity.x / Mathf.Abs(rigid.velocity.x)) * currentMaxRunSpeed;
                 float decelX = (Time.deltaTime / decelTime) * (rigid.velocity.x / Mathf.Abs(rigid.velocity.x)) * currentMoveVars.maxRunSpeed;
 
                 // IF the deceleration vector X value is LESS than the current X velocity...
@@ -167,7 +160,6 @@ public class PlayerMover : MonoBehaviour
         }
 
         // Jumping
-        // if (axisY > 0f && axisY != lastAxisY && (jumpCounter < currentMidairJumps + 1))
         if (axisY > 0f && axisY != lastAxisY && (jumpCounter < currentMoveVars.midairJumps + 1))
         {
             // rigid.velocity = new Vector2(rigid.velocity.x, currentJumpVelocity);
@@ -180,18 +172,19 @@ public class PlayerMover : MonoBehaviour
             rigid.velocity *= new Vector2(1f, 0.5f);
         }
 
+        // Setting the Wand spawn location
+        if (axisX != 0 || axisY != 0)
+        {
+            wandSpawnLocation = new Vector2(axisX, axisY);
+            wandSpawnLocation.Normalize();
+        }
+
         // Waving The Wand
         if (fire1 > 0f && fire1 != lastFire1)
         {
             // Spawning the Wand
-            wandSpawnLocation = new Vector2(axisX, axisY);
-            wandSpawnLocation.Normalize();
             spawnedWand = Instantiate(wandPrefab, transform.position + wandSpawnLocation, Quaternion.identity);
             wandScript = spawnedWand.GetComponent<StaffTrigger>();
-
-            // Rotating the Wand
-            float rotation = Vector3.SignedAngle(Vector3.right, wandSpawnLocation, Vector3.forward);
-            spawnedWand.transform.Rotate(Vector3.forward, rotation);
         }
         if (fire1 == 0f && fire1 != lastFire1)
         {
@@ -204,13 +197,16 @@ public class PlayerMover : MonoBehaviour
             // Moving the Wand to the right place
             spawnedWand.transform.position = transform.position + wandSpawnLocation;
 
+            // Rotating the Wand to the right rotation
+            float rotation = Vector3.SignedAngle(Vector3.right, wandSpawnLocation, Vector3.forward);
+            spawnedWand.transform.rotation = Quaternion.identity;
+            spawnedWand.transform.Rotate(Vector3.forward, rotation);
+
             // IF the Wand has been hooked...
             if (wandScript.IsHooked())
             {
-                // Vector2 modVector = wandSpawnLocation * currentHookSpeed * Time.deltaTime * currentMaxRunSpeed;
                 Vector2 modVector = wandSpawnLocation * currentMoveVars.hookSpeed * Time.deltaTime * currentMoveVars.maxRunSpeed;
                 rigid.velocity += modVector;
-
             }
         }
 
@@ -288,7 +284,6 @@ public class PlayerMover : MonoBehaviour
             rigid.velocity *= 0.8f;
 
             // Setting the water movement variables
-            // WaterMovementVars();
             currentMoveVars = GetMovementVarsByName("Water");
         }
     }
@@ -326,7 +321,6 @@ public class PlayerMover : MonoBehaviour
         if (other.gameObject.tag == "Platform")
         {
             // Enable gravity
-            // rigid.gravityScale = currentGravity;
             rigid.gravityScale = currentMoveVars.gravity;
             grounded = false;
         }
