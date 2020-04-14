@@ -191,23 +191,29 @@ MonoBehaviour:
     type: 3}
   movementVars:
   - name: Normal
+    maxHorizontalVelocity: 40
+    maxVerticalVelocity: 40
+    hookSpeed: 20
     maxRunSpeed: 10
     timeToMaxSpeed: 0.2
     groundedTimeToStop: 0.2
+    maxFallSpeed: -20
     airborneTimeToStop: 1
     jumpVelocity: 15
     midairJumps: 1
     gravity: 3
-    hookSpeed: 20
   - name: Water
+    maxHorizontalVelocity: 40
+    maxVerticalVelocity: 40
+    hookSpeed: 10
     maxRunSpeed: 5
     timeToMaxSpeed: 0.5
     groundedTimeToStop: 0.5
+    maxFallSpeed: -5
     airborneTimeToStop: 0.5
     jumpVelocity: 8
     midairJumps: 4294967294
     gravity: 0.5
-    hookSpeed: 15
 --- !u!114 &2320152832852947553
 MonoBehaviour:
   m_ObjectHideFlags: 0
