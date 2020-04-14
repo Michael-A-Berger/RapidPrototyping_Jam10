@@ -9,4 +9,9 @@ public class Credits : MonoBehaviour
     {
         SceneManager.LoadScene(0);
     }
+
+    public void resources_DawnLike()
+    {
+        Application.OpenURL("https://opengameart.org/content/dawnlike-16x16-universal-rogue-like-tileset-v181");
+    }
 }

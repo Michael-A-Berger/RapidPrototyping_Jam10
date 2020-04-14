@@ -7,13 +7,12 @@ public class Menu : MonoBehaviour
 {
     public void Play()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex+1);
-        Debug.Log("Loaded");
+        SceneManager.LoadScene("Scenes/test_platforming", LoadSceneMode.Single);
     }
 
     public void Credits()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex+2);
+        SceneManager.LoadScene("Scenes/Credits", LoadSceneMode.Single);
     }
 
     public void Quit()

@@ -20,7 +20,7 @@ public class PauseMenu : MonoBehaviour
     }
     public void MainMenu()
     {
-        SceneManager.LoadScene(0);
+        SceneManager.LoadScene("Scenes/Menu", LoadSceneMode.Single);
     }
 
     public void Reseme()
