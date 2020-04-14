@@ -5,31 +5,18 @@ using UnityEngine;
 public class PlayerMover : MonoBehaviour
 {
     // Public Properties
+    [Header("General Variables")]
     public PlayerAnim animScript;
-    public float normalMaxRunSpeed = 10f;
-    public float normalTimeToMaxSpeed = 0.2f;
-    public float normalGroundedTimeToStop = 0.2f;
-    public float normalAirborneTimeToStop = 1.0f;
-    public float normalJumpVelocity = 15f;
-    public int normalMidairJumps = 1;
-    public float normalGravity = 3f;
     public GameObject wandPrefab;
-    public float normalHookSpeed = 20f;
     public bool debug = false;
     public GameObject debugPrefab1;
     public GameObject debugPrefab2;
-
-    // Private "Current" Properties
-    private float currentMaxRunSpeed;
-    private float currentTimeToMaxSpeed;
-    private float currentGroundedTimeToStop;
-    private float currentAirborneTimeToStop;
-    private float currentJumpVelocity;
-    private float currentMidairJumps;
-    private float currentGravity;
-    private float currentHookSpeed;
+    [Header("Movement Settings")]
+    [Space(10)]
+    public List<PlayerMovementSettings> movementVars = new List<PlayerMovementSettings>();
 
     // Private Properties
+    private PlayerMovementSettings currentMoveVars;
     private Rigidbody2D rigid;
     private CapsuleCollider2D capsuleCollider;
     private BoxCollider2D boxTrigger;
@@ -41,7 +28,7 @@ public class PlayerMover : MonoBehaviour
     private float lastAxisX = 0f;
     private float lastAxisY = 0f;
     private float lastFire1 = 0f;
-    private int jumpCounter = 0;
+    private uint jumpCounter = 0;
     private GameObject spawnedWand;
     private StaffTrigger wandScript;
     private Vector3 wandSpawnLocation;
@@ -66,36 +53,29 @@ public class PlayerMover : MonoBehaviour
     private void ResetMovementVars()
     {
         // Setting the "Currrent" properties to be the "Normal" values
-        currentMaxRunSpeed          =   normalMaxRunSpeed;
-        currentTimeToMaxSpeed       =   normalTimeToMaxSpeed;
-        currentGroundedTimeToStop   =   normalGroundedTimeToStop;
-        currentAirborneTimeToStop   =   normalAirborneTimeToStop;
-        currentJumpVelocity         =   normalJumpVelocity;
-        currentMidairJumps          =   normalMidairJumps;
-        currentGravity              =   normalGravity;
-        currentHookSpeed            =   normalHookSpeed;
+        currentMoveVars = GetMovementVarsByName("Normal");
 
         // Setting the rigidbody gravity
-        rigid.gravityScale = currentGravity;
+        rigid.gravityScale = currentMoveVars.gravity;
     }
 
     /// <summary>
-    /// WaterMovementVars()
+    /// GetMovementVarsByName()
     /// </summary>
-    private void WaterMovementVars()
+    /// <param name="name"></param>
+    /// <returns></returns>
+    public PlayerMovementSettings GetMovementVarsByName(string name)
     {
-        // Setting the "Currrent" properties to be the "Water" values
-        currentMaxRunSpeed          = normalMaxRunSpeed / 2f;
-        currentTimeToMaxSpeed       = 0.5f;
-        currentGroundedTimeToStop   = 0.5f;
-        currentAirborneTimeToStop   = 0.5f;
-        currentJumpVelocity         = 8f;
-        currentMidairJumps          = float.PositiveInfinity;
-        currentGravity              = 0.5f;
-        currentHookSpeed            = 15f;
-
-        // Setting the rigidbody gravity
-        rigid.gravityScale = currentGravity;
+        PlayerMovementSettings result = null;
+        for (int num = 0; num < movementVars.Count; num++)
+        {
+            if (movementVars[num].name == name)
+            {
+                result = movementVars[num];
+                num = movementVars.Count;
+            }
+        }
+        return result;
     }
 
     /// <summary>
@@ -121,13 +101,15 @@ public class PlayerMover : MonoBehaviour
         }
 
         // Calculating the deceleration multiplier
-        decelTime = (grounded) ? currentGroundedTimeToStop : currentAirborneTimeToStop;
+        // decelTime = (grounded) ? currentGroundedTimeToStop : currentAirborneTimeToStop;
+        decelTime = (grounded) ? currentMoveVars.groundedTimeToStop : currentMoveVars.airborneTimeToStop;
 
         // Running
         if (axisX != 0f)
         {
             // Calculating the add velocity factor
-            float addVelocityX = axisX * currentMaxRunSpeed * (Time.deltaTime / currentTimeToMaxSpeed);
+            // float addVelocityX = axisX * currentMaxRunSpeed * (Time.deltaTime / currentTimeToMaxSpeed);
+            float addVelocityX = axisX * currentMoveVars.maxRunSpeed * (Time.deltaTime / currentMoveVars.timeToMaxSpeed);
 
             // Creating the move vector
             Vector2 moveVector = new Vector2();
@@ -139,14 +121,17 @@ public class PlayerMover : MonoBehaviour
                 moveVector = new Vector2(addVelocityX, 0f);
 
             // IF the velocity and move vectors are different OR the new velocity does not exceed the max velocity...
-            if (rigid.velocity.x / Mathf.Abs(rigid.velocity.x) != axisX || (rigid.velocity + moveVector).magnitude < currentMaxRunSpeed)
+            // if (rigid.velocity.x / Mathf.Abs(rigid.velocity.x) != axisX || (rigid.velocity + moveVector).magnitude < currentMaxRunSpeed)
+            if (rigid.velocity.x / Mathf.Abs(rigid.velocity.x) != axisX || (rigid.velocity + moveVector).magnitude < currentMoveVars.maxRunSpeed)
             {
                 rigid.velocity += moveVector;
             }
             // ELSE IF the current velocity is less than the max...
-            else if (rigid.velocity.magnitude < currentMaxRunSpeed)
+            // else if (rigid.velocity.magnitude < currentMaxRunSpeed)
+            else if (rigid.velocity.magnitude < currentMoveVars.maxRunSpeed)
             {
-                rigid.velocity = rigid.velocity.normalized * currentMaxRunSpeed;
+                // rigid.velocity = rigid.velocity.normalized * currentMaxRunSpeed;
+                rigid.velocity = rigid.velocity.normalized * currentMoveVars.maxRunSpeed;
             }
         }
 
@@ -157,7 +142,8 @@ public class PlayerMover : MonoBehaviour
             if (grounded)
             {
                 // Calculate the deceleration vector
-                Vector2 decelVector = (Time.deltaTime / decelTime) * rigid.velocity.normalized * currentMaxRunSpeed;
+                // Vector2 decelVector = (Time.deltaTime / decelTime) * rigid.velocity.normalized * currentMaxRunSpeed;
+                Vector2 decelVector = (Time.deltaTime / decelTime) * rigid.velocity.normalized * currentMoveVars.maxRunSpeed;
 
                 // IF the deceleration vector is LESS than the current velocity...
                 if (decelVector.magnitude < rigid.velocity.magnitude)
@@ -169,7 +155,8 @@ public class PlayerMover : MonoBehaviour
             else
             {
                 // Calulate the deceleration vector X value
-                float decelX = (Time.deltaTime / decelTime) * (rigid.velocity.x / Mathf.Abs(rigid.velocity.x)) * currentMaxRunSpeed;
+                // float decelX = (Time.deltaTime / decelTime) * (rigid.velocity.x / Mathf.Abs(rigid.velocity.x)) * currentMaxRunSpeed;
+                float decelX = (Time.deltaTime / decelTime) * (rigid.velocity.x / Mathf.Abs(rigid.velocity.x)) * currentMoveVars.maxRunSpeed;
 
                 // IF the deceleration vector X value is LESS than the current X velocity...
                 if (Mathf.Abs(decelX) < Mathf.Abs(rigid.velocity.x))
@@ -180,9 +167,11 @@ public class PlayerMover : MonoBehaviour
         }
 
         // Jumping
-        if (axisY > 0f && axisY != lastAxisY && (jumpCounter < currentMidairJumps + 1))
+        // if (axisY > 0f && axisY != lastAxisY && (jumpCounter < currentMidairJumps + 1))
+        if (axisY > 0f && axisY != lastAxisY && (jumpCounter < currentMoveVars.midairJumps + 1))
         {
-            rigid.velocity = new Vector2(rigid.velocity.x, currentJumpVelocity);
+            // rigid.velocity = new Vector2(rigid.velocity.x, currentJumpVelocity);
+            rigid.velocity = new Vector2(rigid.velocity.x, currentMoveVars.jumpVelocity);
             grounded = false;
             jumpCounter++;
         }
@@ -218,7 +207,8 @@ public class PlayerMover : MonoBehaviour
             // IF the Wand has been hooked...
             if (wandScript.IsHooked())
             {
-                Vector2 modVector = wandSpawnLocation * currentHookSpeed * Time.deltaTime * currentMaxRunSpeed;
+                // Vector2 modVector = wandSpawnLocation * currentHookSpeed * Time.deltaTime * currentMaxRunSpeed;
+                Vector2 modVector = wandSpawnLocation * currentMoveVars.hookSpeed * Time.deltaTime * currentMoveVars.maxRunSpeed;
                 rigid.velocity += modVector;
 
             }
@@ -294,13 +284,12 @@ public class PlayerMover : MonoBehaviour
         // IF the other collider is Water...
         if (other.gameObject.tag == "Water")
         {
-            Debug.Log("\t=== Entered Water! ===");
-
             // Cut velocity by 20%
             rigid.velocity *= 0.8f;
 
             // Setting the water movement variables
-            WaterMovementVars();
+            // WaterMovementVars();
+            currentMoveVars = GetMovementVarsByName("Water");
         }
     }
 
@@ -337,14 +326,14 @@ public class PlayerMover : MonoBehaviour
         if (other.gameObject.tag == "Platform")
         {
             // Enable gravity
-            rigid.gravityScale = currentGravity;
+            // rigid.gravityScale = currentGravity;
+            rigid.gravityScale = currentMoveVars.gravity;
             grounded = false;
         }
 
         // IF the other collider is Water...
         if (other.gameObject.tag == "Water")
         {
-            Debug.Log("\t=== Left Water! ===");
             // Resetting the normal movement variables
             ResetMovementVars();
 
@@ -352,4 +341,28 @@ public class PlayerMover : MonoBehaviour
             jumpCounter = 1;
         }
     }
+}
+
+[System.Serializable]
+public class PlayerMovementSettings
+{
+    // Public Properties (Default values are for 
+    [Tooltip("What this movement setting is called (also the name to search for in the [GetMovementVarsByName()] function)")]
+    public string name = "Normal";
+    [Tooltip("How many units does the player move in a second?")]
+    public float maxRunSpeed = 10f;
+    [Tooltip("How many seconds does it take for the player to reach the max run speed?")]
+    public float timeToMaxSpeed = 0.2f;
+    [Tooltip("How many seconds does it take for the player, on the ground, to reach a velocity of zero?")]
+    public float groundedTimeToStop = 0.2f;
+    [Tooltip("How many seconds does it take for the player, in the air, to reach a velocity of zero?")]
+    public float airborneTimeToStop = 1.0f;
+    [Tooltip("What is the initial Y velocity when the player jumps?")]
+    public float jumpVelocity = 15f;
+    [Tooltip("How many midair jumps can the player perform?")]
+    public uint midairJumps = 1;
+    [Tooltip("What is the gravity scale of the Rigidbody?")]
+    public float gravity = 3f;
+    [Tooltip("What is the speed (velocity / second) of when the Wand is inside of a Lantern?")]
+    public float hookSpeed = 20f;
 }
