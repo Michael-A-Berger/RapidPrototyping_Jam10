@@ -17,7 +17,9 @@ public class PlayerMover : MonoBehaviour
 
     // Private Properties
     private PlayerMovementSettings currentMoveVars;
+    private SpriteRenderer playerSprite;
     private Rigidbody2D rigid;
+    private ParticleSystem deathParticles;
     private CapsuleCollider2D capsuleCollider;
     private BoxCollider2D boxTrigger;
     private Vector2 lastVelocity;
@@ -30,6 +32,7 @@ public class PlayerMover : MonoBehaviour
     private GameObject spawnedWand;
     private StaffTrigger wandScript;
     private Vector3 wandSpawnLocation = new Vector3(1, 0, 0);
+    private bool inputEnabled = true;
     private bool grounded = false;
 
     /// <summary>
@@ -37,7 +40,9 @@ public class PlayerMover : MonoBehaviour
     /// </summary>
     void Start()
     {
+        playerSprite = GetComponent<SpriteRenderer>();
         rigid = GetComponent<Rigidbody2D>();
+        deathParticles = GetComponentInChildren<ParticleSystem>();
         capsuleCollider = GetComponent<CapsuleCollider2D>();
         boxTrigger = GetComponent<BoxCollider2D>();
 
@@ -81,10 +86,19 @@ public class PlayerMover : MonoBehaviour
     /// </summary>
     void Update()
     {
-        // Getting the new input values
-        float axisX = Input.GetAxisRaw("Horizontal");
-        float axisY = Input.GetAxisRaw("Vertical");
-        float fire1 = Input.GetAxisRaw("Fire1");
+        // Defining the (new) input value variables
+        float axisX = 0.0f;
+        float axisY = 0.0f;
+        float fire1 = 0.0f;
+
+        // IF input is enabled...
+        if (inputEnabled)
+        {
+            // Getting the new input values
+            axisX = Input.GetAxisRaw("Horizontal");
+            axisY = Input.GetAxisRaw("Vertical");
+            fire1 = Input.GetAxisRaw("Fire1");
+        }
 
         // Retrieving the correct deceleration time
         decelTime = (grounded) ? currentMoveVars.groundedTimeToStop : currentMoveVars.airborneTimeToStop;
@@ -278,7 +292,40 @@ public class PlayerMover : MonoBehaviour
     }
 
     /// <summary>
-    /// OnTriggerEnter()
+    /// Kill the player
+    /// </summary>
+    private void KillPlayer()
+    {
+        // "Killing" the player (Hide sprite, Set gravity + velocity to zero, Disable input)
+        playerSprite.enabled = false;
+        rigid.gravityScale = 0f;
+        rigid.velocity *= 0f;
+        inputEnabled = false;
+
+        // Turning on the particles that play on death
+        deathParticles.Play();
+    }
+
+    /// <summary>
+    /// Respawning the player
+    /// </summary>
+    private IEnumerator RespawnPlayer(float waitTime)
+    {
+        // Waiting for the designated amount of seconds
+        yield return new WaitForSeconds(waitTime);
+
+        // "Respawning" the player (Show sprite, Enable gravity, Enable input)
+        playerSprite.enabled = true;
+        rigid.gravityScale = currentMoveVars.gravity;
+        inputEnabled = true;
+
+        // TEST TEST TEST
+        transform.position = Vector3.zero;
+        // TEST TEST TEST
+    }
+
+    /// <summary>
+    /// Activates when the BOX TRIGGER first touches something
     /// </summary>
     /// <param name="other"></param>
     void OnTriggerEnter2D(Collider2D other)
@@ -321,7 +368,7 @@ public class PlayerMover : MonoBehaviour
     }
 
     /// <summary>
-    /// OnTriggerStay()
+    /// Activates when the BOX TRIGGER remains in contact with something
     /// </summary>
     /// <param name="other"></param>
     void OnTriggerStay2D(Collider2D other)
@@ -344,7 +391,7 @@ public class PlayerMover : MonoBehaviour
     }
 
     /// <summary>
-    /// OnTriggerExit2D()
+    /// Activates when the BOX TRIGGER leaves something
     /// </summary>
     /// <param name="other"></param>
     void OnTriggerExit2D(Collider2D other)
@@ -365,6 +412,45 @@ public class PlayerMover : MonoBehaviour
 
             // Letting the player double-jump once to get out of the water
             jumpCounter = 1;
+        }
+    }
+
+    /// <summary>
+    /// Activates when the CAPSULE COLLIDER first touches something
+    /// </summary>
+    /// <param name="other"></param>
+    private void OnCollisionEnter2D(Collision2D other)
+    {
+        // IF the other collider is Lava...
+        if (other.gameObject.tag == "Lava")
+        {
+            // Killing the player
+            KillPlayer();
+
+            // Respawning the player
+            StartCoroutine(RespawnPlayer(2));
+        }
+    }
+
+    /// <summary>
+    /// Activates when CAPSULE COLLIDER remains in contact with something
+    /// </summary>
+    /// <param name="collision"></param>
+    private void OnCollisionStay2D(Collision2D other)
+    {
+        
+    }
+
+    /// <summary>
+    /// Activates when the CAPSULE COLLIDER leaves something
+    /// </summary>
+    /// <param name="collision"></param>
+    private void OnCollisionExit2D(Collision2D other)
+    {
+        // IF the other collider is Lava...
+        if (other.gameObject.tag == "Lava")
+        {
+            Debug.Log("\tLeft Lava!");
         }
     }
 }

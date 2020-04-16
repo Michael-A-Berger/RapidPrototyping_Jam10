@@ -8,6 +8,7 @@ TagManager:
   - Wand
   - Lantern
   - Water
+  - Lava
   layers:
   - Default
   - TransparentFX
