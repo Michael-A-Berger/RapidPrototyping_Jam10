@@ -8,6 +8,8 @@ TagManager:
   - Wand
   - Lantern
   - Water
+  - Lava
+  - Checkpoint Trigger
   layers:
   - Default
   - TransparentFX
