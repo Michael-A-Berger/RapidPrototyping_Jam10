@@ -9,6 +9,7 @@ TagManager:
   - Lantern
   - Water
   - Lava
+  - Checkpoint Trigger
   layers:
   - Default
   - TransparentFX

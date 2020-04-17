@@ -8,6 +8,13 @@ public class PlayerMover : MonoBehaviour
     [Header("General Variables")]
     public PlayerAnim animScript;
     public GameObject wandPrefab;
+    public Transform currentCheckpoint = null;
+    public ParticleSystem deathParticles;
+    public ParticleSystem checkpointParticles;
+    public float deathRespawnTime = 2.0f;
+    public float forceRespawnTime = 1.0f;
+    [Header("Debug Variables")]
+    [Space(10)]
     public bool debug = false;
     public GameObject debugPrefab1;
     public GameObject debugPrefab2;
@@ -15,25 +22,31 @@ public class PlayerMover : MonoBehaviour
     [Space(10)]
     public List<PlayerMovementSettings> movementVars = new List<PlayerMovementSettings>();
 
-    // Private Properties
+    // Private Properties (General)
     private PlayerMovementSettings currentMoveVars;
     private SpriteRenderer playerSprite;
     private Rigidbody2D rigid;
-    private ParticleSystem deathParticles;
     private CapsuleCollider2D capsuleCollider;
     private BoxCollider2D boxTrigger;
     private Vector2 lastVelocity;
     private Vector3 slopeAxis = Vector3.right;
     private float decelTime = 0f;
-    private float lastAxisX = 0f;
-    private float lastAxisY = 0f;
-    private float lastFire1 = 0f;
     private uint jumpCounter = 0;
     private GameObject spawnedWand;
     private StaffTrigger wandScript;
     private Vector3 wandSpawnLocation = new Vector3(1, 0, 0);
     private bool inputEnabled = true;
     private bool grounded = false;
+
+    // Private Properties (Input)
+    private float currentAxisX = 0f;
+    private float currentAxisY = 0f;
+    private float currentFire1 = 0f;
+    private float currentFire2 = 0f;
+    private float lastAxisX = 0f;
+    private float lastAxisY = 0f;
+    private float lastFire1 = 0f;
+    private float lastFire2 = 0f;
 
     /// <summary>
     /// Start()
@@ -42,9 +55,12 @@ public class PlayerMover : MonoBehaviour
     {
         playerSprite = GetComponent<SpriteRenderer>();
         rigid = GetComponent<Rigidbody2D>();
-        deathParticles = GetComponentInChildren<ParticleSystem>();
         capsuleCollider = GetComponent<CapsuleCollider2D>();
         boxTrigger = GetComponent<BoxCollider2D>();
+
+        // Initialization Warnings
+        if (currentCheckpoint == null)
+            Debug.LogError("\t[ currentCheckpoint ] of [ PlayerMover.cs ] script not set!");
 
         // Setting the movement variables
         ResetMovementVars();
@@ -82,23 +98,50 @@ public class PlayerMover : MonoBehaviour
     }
 
     /// <summary>
+    /// Gets the current Unity input (assuming input is enabled)
+    /// </summary>
+    private void GetInput()
+    {
+        // IF player input is enabled...
+        if (inputEnabled)
+        {
+            // Getting the new input values
+            currentAxisX = Input.GetAxisRaw("Horizontal");
+            currentAxisY = Input.GetAxisRaw("Vertical");
+            currentFire1 = Input.GetAxisRaw("Fire1");
+            currentFire2 = Input.GetAxisRaw("Fire2");
+        }
+        // ELSE... (player input is disabled)
+        else
+        {
+            // Setting all the input values to zero
+            currentAxisX = 0.0f;
+            currentAxisY = 0.0f;
+            currentFire1 = 0.0f;
+            currentFire2 = 0.0f;
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    private void SetOldInput()
+    {
+        // Setting the "Last Run Time" variables
+        lastAxisX = currentAxisX;
+        lastAxisY = currentAxisY;
+        lastFire1 = currentFire1;
+        lastFire2 = currentFire2;
+        lastVelocity = rigid.velocity;
+    }
+
+    /// <summary>
     /// Update()
     /// </summary>
     void Update()
     {
-        // Defining the (new) input value variables
-        float axisX = 0.0f;
-        float axisY = 0.0f;
-        float fire1 = 0.0f;
-
-        // IF input is enabled...
-        if (inputEnabled)
-        {
-            // Getting the new input values
-            axisX = Input.GetAxisRaw("Horizontal");
-            axisY = Input.GetAxisRaw("Vertical");
-            fire1 = Input.GetAxisRaw("Fire1");
-        }
+        // Getting the input values
+        GetInput();
 
         // Retrieving the correct deceleration time
         decelTime = (grounded) ? currentMoveVars.groundedTimeToStop : currentMoveVars.airborneTimeToStop;
@@ -108,10 +151,10 @@ public class PlayerMover : MonoBehaviour
         // =============================
 
         // IF there is any running input...
-        if (axisX != 0f)
+        if (currentAxisX != 0f)
         {
             // Calculating the add velocity factor
-            float addVelocityX = axisX * currentMoveVars.maxRunSpeed * (Time.deltaTime / currentMoveVars.timeToMaxSpeed);
+            float addVelocityX = currentAxisX * currentMoveVars.maxRunSpeed * (Time.deltaTime / currentMoveVars.timeToMaxSpeed);
 
             // Creating the move vector
             Vector2 moveVector = new Vector2();
@@ -124,7 +167,7 @@ public class PlayerMover : MonoBehaviour
 
             // IF the velocity and input directions are different OR the new velocity does not exceed the max velocity...
             float currentDirectionX = rigid.velocity.x / Mathf.Abs(rigid.velocity.x);
-            if (currentDirectionX != axisX || (rigid.velocity + moveVector).magnitude < currentMoveVars.maxRunSpeed)
+            if (currentDirectionX != currentAxisX || (rigid.velocity + moveVector).magnitude < currentMoveVars.maxRunSpeed)
             {
                 // Adding the move vector onto the current velocity
                 rigid.velocity += moveVector;
@@ -138,7 +181,7 @@ public class PlayerMover : MonoBehaviour
         }
 
         // IF the player is not holding down a button (but is still moving horizontally)...
-        if (axisX == 0f && rigid.velocity.x != 0f)
+        if (currentAxisX == 0f && rigid.velocity.x != 0f)
         {
             // IF the player is grounded, decelerate along the slope axis
             if (grounded)
@@ -172,7 +215,7 @@ public class PlayerMover : MonoBehaviour
         // =============================
 
         // IF there is jump input AND it's new input AND the player can still jump...
-        if (axisY > 0f && axisY != lastAxisY && (jumpCounter < currentMoveVars.midairJumps + 1))
+        if (currentAxisY > 0f && currentAxisY != lastAxisY && (jumpCounter < currentMoveVars.midairJumps + 1))
         {
             rigid.velocity = new Vector2(rigid.velocity.x, currentMoveVars.jumpVelocity);
             grounded = false;
@@ -180,14 +223,14 @@ public class PlayerMover : MonoBehaviour
         }
 
         // IF there is no input jump AND the lack of input just started AND the player is airborne AND the player is still jumping up...
-        if (axisY == 0f && axisY != lastAxisY && !grounded && rigid.velocity.y > 0f)
+        if (currentAxisY == 0f && currentAxisY != lastAxisY && !grounded && rigid.velocity.y > 0f)
         {
             // Reduce the player's vertical speed by half
             rigid.velocity *= new Vector2(1f, 0.5f);
         }
 
         // IF the player is not pressing the down button AND the current Y velocity is faster than the designated fall speed...
-        if (axisY > -1f && rigid.velocity.y < currentMoveVars.maxFallSpeed)
+        if (currentAxisY > -1f && rigid.velocity.y < currentMoveVars.maxFallSpeed)
         {
             // Calculating the vertical deceleration value
             float decelY = (Time.deltaTime / decelTime) * currentMoveVars.airborneTimeToStop + Physics2D.gravity.y * -1f;
@@ -200,7 +243,7 @@ public class PlayerMover : MonoBehaviour
                 rigid.velocity = new Vector2(rigid.velocity.x, currentMoveVars.maxFallSpeed);
         }
         // ELSE IF the player is pressing the down button AND the current Y velocity is faster than the designated fall speed...
-        else if (axisY == -1f && rigid.velocity.y < currentMoveVars.maxFallSpeed)
+        else if (currentAxisY == -1f && rigid.velocity.y < currentMoveVars.maxFallSpeed)
         {
             // Keeping the Y velocity the same across the Update() calls
             rigid.velocity = new Vector2(rigid.velocity.x, lastVelocity.y);
@@ -211,14 +254,14 @@ public class PlayerMover : MonoBehaviour
         // =====================================
 
         // Setting the Wand spawn location
-        if (axisX != 0 || axisY != 0)
+        if (currentAxisX != 0 || currentAxisY != 0)
         {
-            wandSpawnLocation = new Vector2(axisX, axisY);
+            wandSpawnLocation = new Vector2(currentAxisX, currentAxisY);
             wandSpawnLocation.Normalize();
         }
 
         // IF the Wand waving input is down AND it's new...
-        if (fire1 > 0f && fire1 != lastFire1)
+        if (currentFire1 > 0f && currentFire1 != lastFire1)
         {
             // Spawning the Wand
             spawnedWand = Instantiate(wandPrefab, transform.position + wandSpawnLocation, Quaternion.identity);
@@ -226,7 +269,7 @@ public class PlayerMover : MonoBehaviour
         }
 
         // IF the Wand waving input is up AND it's new...
-        if (fire1 == 0f && fire1 != lastFire1)
+        if (currentFire1 == 0f && currentFire1 != lastFire1)
         {
             // Destroying the Wand
             Destroy(spawnedWand, 0f);
@@ -251,24 +294,33 @@ public class PlayerMover : MonoBehaviour
             }
         }
 
+        // ======================================
+        // ===== RESTARTING FROM CHECKPOINT =====
+        // ======================================
+
+        // IF the player is pressing the restart button AND it's a new input...
+        if (currentFire2 != 0.0f && currentFire2 != lastFire2)
+        {
+            // Killing the player and then respawning them
+            KillPlayer();
+            StartCoroutine(RespawnPlayer(forceRespawnTime));
+        }
+
         // Clamping the velocities
         float clampedX = Mathf.Clamp(rigid.velocity.x, -currentMoveVars.maxHorizontalVelocity, currentMoveVars.maxHorizontalVelocity);
         float clampedY = Mathf.Clamp(rigid.velocity.y, -currentMoveVars.maxVerticalVelocity, currentMoveVars.maxVerticalVelocity);
         rigid.velocity = new Vector2(clampedX, clampedY);
 
         // ANIMATING
-        if (axisX > 0f)
+        if (currentAxisX > 0f)
             animScript.MoveRight();
-        else if (axisX < 0f)
+        else if (currentAxisX < 0f)
             animScript.MoveLeft();
         else
             animScript.StandStill();
 
-        // Setting the "Last Run Time" variables
-        lastAxisX = axisX;
-        lastAxisY = axisY;
-        lastFire1 = fire1;
-        lastVelocity = rigid.velocity;
+        // Setting the old input
+        SetOldInput();
     }
 
     /// <summary>
@@ -303,6 +355,11 @@ public class PlayerMover : MonoBehaviour
         inputEnabled = false;
 
         // Turning on the particles that play on death
+        if (deathParticles.isPlaying)
+        {
+            deathParticles.Stop();
+            deathParticles.time = 0;
+        }
         deathParticles.Play();
     }
 
@@ -319,13 +376,35 @@ public class PlayerMover : MonoBehaviour
         rigid.gravityScale = currentMoveVars.gravity;
         inputEnabled = true;
 
-        // TEST TEST TEST
-        transform.position = Vector3.zero;
-        // TEST TEST TEST
+        // Changing the current position to the checkpoint
+        transform.position = currentCheckpoint.position;
     }
 
     /// <summary>
-    /// Activates when the BOX TRIGGER first touches something
+    /// Changes the checkpoint
+    /// </summary>
+    private void ChangeCheckpoint(Transform checkpoint)
+    {
+        // IF the new checkpoint is NOT the starting checkpoint...
+        if (checkpoint.gameObject.name != currentCheckpoint.gameObject.name)
+        {
+            // Stopping the current checkpoint particles
+            ParticleSystem oldParticles = currentCheckpoint.gameObject.GetComponentInChildren<ParticleSystem>();
+            oldParticles.gameObject.SetActive(false);
+
+            // Playing the checkpoint particles + Setting the checkpoint transform
+            if (checkpointParticles.isPlaying)
+            {
+                checkpointParticles.Stop();
+                checkpointParticles.time = 0;
+            }
+            checkpointParticles.Play();
+            currentCheckpoint = checkpoint;
+        }
+    }
+
+    /// <summary>
+    /// Activates when the BOX TRIGGER first touches another trigger
     /// </summary>
     /// <param name="other"></param>
     void OnTriggerEnter2D(Collider2D other)
@@ -365,10 +444,16 @@ public class PlayerMover : MonoBehaviour
             // Setting the water movement variables
             currentMoveVars = GetMovementVarsByName("Water");
         }
+
+        // IF the other collider is a Checkpoint Trigger...
+        if (other.gameObject.tag == "Checkpoint Trigger")
+        {
+            ChangeCheckpoint(other.gameObject.transform.parent);
+        }
     }
 
     /// <summary>
-    /// Activates when the BOX TRIGGER remains in contact with something
+    /// Activates when the BOX TRIGGER remains in contact with another trigger
     /// </summary>
     /// <param name="other"></param>
     void OnTriggerStay2D(Collider2D other)
@@ -391,7 +476,7 @@ public class PlayerMover : MonoBehaviour
     }
 
     /// <summary>
-    /// Activates when the BOX TRIGGER leaves something
+    /// Activates when the BOX TRIGGER leaves another trigger
     /// </summary>
     /// <param name="other"></param>
     void OnTriggerExit2D(Collider2D other)
@@ -416,7 +501,7 @@ public class PlayerMover : MonoBehaviour
     }
 
     /// <summary>
-    /// Activates when the CAPSULE COLLIDER first touches something
+    /// Activates when the CAPSULE COLLIDER first touches another collider
     /// </summary>
     /// <param name="other"></param>
     private void OnCollisionEnter2D(Collision2D other)
@@ -433,7 +518,7 @@ public class PlayerMover : MonoBehaviour
     }
 
     /// <summary>
-    /// Activates when CAPSULE COLLIDER remains in contact with something
+    /// Activates when CAPSULE COLLIDER remains in contact with another collider
     /// </summary>
     /// <param name="collision"></param>
     private void OnCollisionStay2D(Collision2D other)
@@ -442,16 +527,12 @@ public class PlayerMover : MonoBehaviour
     }
 
     /// <summary>
-    /// Activates when the CAPSULE COLLIDER leaves something
+    /// Activates when the CAPSULE COLLIDER leaves another collider
     /// </summary>
     /// <param name="collision"></param>
     private void OnCollisionExit2D(Collision2D other)
     {
-        // IF the other collider is Lava...
-        if (other.gameObject.tag == "Lava")
-        {
-            Debug.Log("\tLeft Lava!");
-        }
+        
     }
 }
 
