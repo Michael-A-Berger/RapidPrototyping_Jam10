@@ -51,7 +51,9 @@ public class ScaleRelativeCollider : MonoBehaviour
         {
             CalculatePercentages();
             Gizmos.color = gizmoColor;
-            Gizmos.DrawCube(transform.position, transform.localScale * percentages);
+            Gizmos.matrix = transform.localToWorldMatrix;
+            Gizmos.DrawCube(Vector3.zero, Vector3.one * percentages);
+            Gizmos.matrix = Matrix4x4.identity;
         }
     }
 }
