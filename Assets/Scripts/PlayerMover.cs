@@ -30,6 +30,7 @@ public class PlayerMover : MonoBehaviour
     private BoxCollider2D boxTrigger;
     private Vector2 lastVelocity;
     private Vector3 slopeAxis = Vector3.right;
+    private Vector2 passiveVelocity = Vector2.zero;
     private float decelTime = 0f;
     private uint jumpCounter = 0;
     private GameObject spawnedWand;
@@ -163,6 +164,10 @@ public class PlayerMover : MonoBehaviour
 
         // Retrieving the correct deceleration time
         decelTime = (grounded) ? currentMoveVars.groundedTimeToStop : currentMoveVars.airborneTimeToStop;
+
+        // IF the passive velocity is greater than zero, decrease it from the current velocity calculations
+        if (passiveVelocity != Vector2.zero)
+            rigid.velocity -= passiveVelocity;
 
         // =============================
         // ========== RUNNING ==========
@@ -324,6 +329,9 @@ public class PlayerMover : MonoBehaviour
             StartCoroutine(RespawnPlayer(forceRespawnTime));
         }
 
+        // Adding the passive velocity
+        rigid.velocity += passiveVelocity;
+
         // Clamping the velocities
         float clampedX = Mathf.Clamp(rigid.velocity.x, -currentMoveVars.maxHorizontalVelocity, currentMoveVars.maxHorizontalVelocity);
         float clampedY = Mathf.Clamp(rigid.velocity.y, -currentMoveVars.maxVerticalVelocity, currentMoveVars.maxVerticalVelocity);
@@ -366,10 +374,11 @@ public class PlayerMover : MonoBehaviour
     /// </summary>
     private void KillPlayer()
     {
-        // "Killing" the player (Hide sprite, Set gravity + velocity to zero, Disable input)
+        // "Killing" the player (Hide sprite, Set gravity + velocity + passive velocity to zero, Disable input)
         playerSprite.enabled = false;
         rigid.gravityScale = 0f;
-        rigid.velocity *= 0f;
+        rigid.velocity *= 0;
+        passiveVelocity *= 0;
         inputEnabled = false;
 
         // Turning on the particles that play on death
@@ -395,7 +404,7 @@ public class PlayerMover : MonoBehaviour
         inputEnabled = true;
 
         // Changing the current position to the checkpoint
-        transform.position = currentCheckpoint.position;
+        rigid.MovePosition(currentCheckpoint.position);
     }
 
     /// <summary>
@@ -567,6 +576,20 @@ public class PlayerMover : MonoBehaviour
                 ProcessAsPlatform(otherBox, true);
             }
         }
+
+        // IF the other collider is a moving platform...
+        if (other.gameObject.tag == "Moving Platform")
+        {
+            // Getting the moving platform Rigidbody 2D + Box Collider 2D
+            Rigidbody2D otherRigid = other.gameObject.GetComponent<Rigidbody2D>();
+            BoxCollider2D otherBox = other.gameObject.GetComponent<BoxCollider2D>();
+
+            // Processing the moving platform like any platform
+            ProcessAsPlatform(otherBox, true);
+
+            // Setting the player's passive velocity to the platform's velocity
+            passiveVelocity = otherRigid.velocity;
+        }
     }
 
     /// <summary>
@@ -582,6 +605,24 @@ public class PlayerMover : MonoBehaviour
             BoxCollider2D otherBox = other.gameObject.GetComponent<BoxCollider2D>();
             ProcessAsPlatform(otherBox, false);
         }
+
+        // IF the other collider is a moving platform...
+        if (other.gameObject.tag == "Moving Platform")
+        {
+            // Getting the moving platform Rigidbody 2D + Box Collider 2D
+            Rigidbody2D otherRigid = other.gameObject.GetComponent<Rigidbody2D>();
+            BoxCollider2D otherBox = other.gameObject.GetComponent<BoxCollider2D>();
+
+            // Processing the moving platform like any platform
+            ProcessAsPlatform(otherBox, true);
+
+            // IF the player's passive velocity is NOT the same as than the platform's velocity...
+            if (passiveVelocity != otherRigid.velocity)
+            {
+                // Updating the passive velocity
+                passiveVelocity = otherRigid.velocity;
+            }
+        }
     }
 
     /// <summary>
@@ -594,6 +635,16 @@ public class PlayerMover : MonoBehaviour
         if (other.gameObject.tag == "Speed Barrier")
         {
             // Releasing from the speed barrier like it's a platform
+            ReleaseFromPlatform();
+        }
+
+        // IF the other collider is a moving platform...
+        if (other.gameObject.tag == "Moving Platform")
+        {
+            // Set the passive velocity to zero
+            passiveVelocity *= 0;
+
+            // Releasing from the moving platform like it's a platform
             ReleaseFromPlatform();
         }
     }

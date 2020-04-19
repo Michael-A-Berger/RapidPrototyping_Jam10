@@ -11,6 +11,7 @@ TagManager:
   - Lava
   - Checkpoint Trigger
   - Speed Barrier
+  - Moving Platform
   layers:
   - Default
   - TransparentFX
