@@ -2310,6 +2310,18 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 2320152832646873672}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &341340195 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2320152832852947552, guid: 287e3b89496190044a0dd8622ece763d,
+    type: 3}
+  m_PrefabInstance: {fileID: 2320152832646873672}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 341340194}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b940844a8dfee3f4f820ab6486107a4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &362576070
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -17100,11 +17112,21 @@ PrefabInstance:
       propertyPath: m_RootOrder
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 9076123470587029275, guid: 7a9731d2a0c94274ba4ef6ac2ff97833,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: Resume
+      objectReference: {fileID: 0}
     - target: {fileID: 9076123470822715232, guid: 7a9731d2a0c94274ba4ef6ac2ff97833,
         type: 3}
       propertyPath: m_Name
       value: Pause Menu
       objectReference: {fileID: 0}
+    - target: {fileID: 9076123470822715234, guid: 7a9731d2a0c94274ba4ef6ac2ff97833,
+        type: 3}
+      propertyPath: player
+      value: 
+      objectReference: {fileID: 341340195}
     - target: {fileID: 9076123470822715235, guid: 7a9731d2a0c94274ba4ef6ac2ff97833,
         type: 3}
       propertyPath: m_LocalPosition.x
