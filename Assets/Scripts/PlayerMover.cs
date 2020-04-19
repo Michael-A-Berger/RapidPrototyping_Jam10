@@ -98,6 +98,15 @@ public class PlayerMover : MonoBehaviour
     }
 
     /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    public Vector2 GetLastVelocity()
+    {
+        return lastVelocity;
+    }
+
+    /// <summary>
     /// Gets the current Unity input (assuming input is enabled)
     /// </summary>
     private void GetInput()
@@ -409,6 +418,42 @@ public class PlayerMover : MonoBehaviour
     }
 
     /// <summary>
+    /// 
+    /// </summary>
+    private void ProcessAsPlatform(BoxCollider2D platform, bool fromEnterFunc)
+    {
+        // Get the closest point to the player
+        Vector3 closestPoint = platform.ClosestPoint(transform.position);
+
+        // IF the closest point is on the ground...
+        if (closestPoint.y <= transform.position.y - boxTrigger.bounds.extents.y / 2)
+            GroundPlayer(closestPoint);
+
+        // IF the process was started from an "Enter" function AND debug is on, spawn the debug prefabs
+        if (fromEnterFunc && debug)
+        {
+            if (grounded)
+            {
+                Instantiate(debugPrefab1, closestPoint, Quaternion.identity);
+            }
+            else
+            {
+                Instantiate(debugPrefab2, closestPoint, Quaternion.identity);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    private void ReleaseFromPlatform()
+    {
+        // Enable gravity
+        rigid.gravityScale = currentMoveVars.gravity;
+        grounded = false;
+    }
+
+    /// <summary>
     /// Activates when the BOX TRIGGER first touches another trigger
     /// </summary>
     /// <param name="other"></param>
@@ -420,24 +465,8 @@ public class PlayerMover : MonoBehaviour
             // Casting to the correct collider type
             BoxCollider2D otherBox = (BoxCollider2D) other;
 
-            // Get the closest point to the player
-            Vector3 closestPoint = otherBox.ClosestPoint(transform.position);
-
-            // IF the closest point is on the ground...
-            if (closestPoint.y <= transform.position.y - boxTrigger.bounds.extents.y / 2)
-                GroundPlayer(closestPoint);
-
-            if (debug)
-            {
-                if (grounded)
-                {
-                    Instantiate(debugPrefab1, closestPoint, Quaternion.identity);
-                }
-                else
-                {
-                    Instantiate(debugPrefab2, closestPoint, Quaternion.identity);
-                }
-            }
+            // Processing the platform as a proper platform
+            ProcessAsPlatform(otherBox, true);
         }
 
         // IF the other collider is Water...
@@ -469,14 +498,8 @@ public class PlayerMover : MonoBehaviour
             // Casting to the correct collider type
             BoxCollider2D otherBox = (BoxCollider2D)other;
 
-            // Get the closest point to the player
-            Vector3 closestPoint = otherBox.ClosestPoint(transform.position);
-
-            // IF the closest point is on the ground...
-            if (closestPoint.y <= transform.position.y - boxTrigger.bounds.extents.y / 2)
-            {
-                GroundPlayer(closestPoint);
-            }
+            // Processing the platform as a proper platform
+            ProcessAsPlatform(otherBox, false);
         }
     }
 
@@ -489,9 +512,8 @@ public class PlayerMover : MonoBehaviour
         // IF the other collider is a Platform...
         if (other.gameObject.tag == "Platform")
         {
-            // Enable gravity
-            rigid.gravityScale = currentMoveVars.gravity;
-            grounded = false;
+            // Releasing from the platform
+            ReleaseFromPlatform();
         }
 
         // IF the other collider is Water...
@@ -520,6 +542,27 @@ public class PlayerMover : MonoBehaviour
             // Respawning the player
             StartCoroutine(RespawnPlayer(2));
         }
+
+        // IF the other collider is a speed barrier...
+        if (other.gameObject.tag == "Speed Barrier")
+        {
+            // Getting the Speed Barrier script
+            SpeedBarrier barrier = other.gameObject.GetComponent<SpeedBarrier>();
+
+            // IF the previous frame's velocity is greater than the speed barrier's break velocity...
+            if (lastVelocity.magnitude >= barrier.breakVelocity)
+            {
+                // Setting the current velocity to the previous frame's velocity
+                rigid.velocity = lastVelocity;
+            }
+            // ELSE... (the previous velocity was smaller than the break velocity...)
+            else
+            {
+                // Process the speed barrier like any platform
+                BoxCollider2D otherBox = other.gameObject.GetComponent<BoxCollider2D>();
+                ProcessAsPlatform(otherBox, true);
+            }
+        }
     }
 
     /// <summary>
@@ -528,7 +571,13 @@ public class PlayerMover : MonoBehaviour
     /// <param name="collision"></param>
     private void OnCollisionStay2D(Collision2D other)
     {
-        
+        // IF the other collider is a speed barrier...
+        if (other.gameObject.tag == "Speed Barrier")
+        {
+            // Processing the speed barrier like any platform
+            BoxCollider2D otherBox = other.gameObject.GetComponent<BoxCollider2D>();
+            ProcessAsPlatform(otherBox, false);
+        }
     }
 
     /// <summary>
@@ -537,7 +586,12 @@ public class PlayerMover : MonoBehaviour
     /// <param name="collision"></param>
     private void OnCollisionExit2D(Collision2D other)
     {
-        
+        // IF the other collider is a speed barrier...
+        if (other.gameObject.tag == "Speed Barrier")
+        {
+            // Releasing from the speed barrier like it's a platform
+            ReleaseFromPlatform();
+        }
     }
 }
 
