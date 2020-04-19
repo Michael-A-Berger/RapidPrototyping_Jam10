@@ -135,6 +135,11 @@ public class PlayerMover : MonoBehaviour
         lastVelocity = rigid.velocity;
     }
 
+    public void SetInputEnabled(bool targerStatus)
+    {
+        inputEnabled = targerStatus;
+    }
+
     /// <summary>
     /// Update()
     /// </summary>
