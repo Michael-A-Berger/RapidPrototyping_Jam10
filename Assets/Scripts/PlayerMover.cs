@@ -67,7 +67,7 @@ public class PlayerMover : MonoBehaviour
     }
 
     /// <summary>
-    /// ResetMovementVars()
+    /// Resets the movement settings to their "Normal" values
     /// </summary>
     private void ResetMovementVars()
     {
@@ -79,7 +79,7 @@ public class PlayerMover : MonoBehaviour
     }
 
     /// <summary>
-    /// GetMovementVarsByName()
+    /// Returns the movement settings instance with the name that EXACTLY matches the given name
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
@@ -98,7 +98,7 @@ public class PlayerMover : MonoBehaviour
     }
 
     /// <summary>
-    /// 
+    /// Returns the previous frame's rigidbody velocity
     /// </summary>
     /// <returns></returns>
     public Vector2 GetLastVelocity()
@@ -132,7 +132,7 @@ public class PlayerMover : MonoBehaviour
     }
 
     /// <summary>
-    /// 
+    /// Setting the various "last___" input variables
     /// </summary>
     private void SetOldInput()
     {
@@ -144,9 +144,13 @@ public class PlayerMover : MonoBehaviour
         lastVelocity = rigid.velocity;
     }
 
-    public void SetInputEnabled(bool targerStatus)
+    /// <summary>
+    /// Toggles whether the player listens for any new input
+    /// </summary>
+    /// <param name="targetStatus"></param>
+    public void SetInputEnabled(bool targetStatus)
     {
-        inputEnabled = targerStatus;
+        inputEnabled = targetStatus;
     }
 
     /// <summary>
@@ -161,7 +165,7 @@ public class PlayerMover : MonoBehaviour
         decelTime = (grounded) ? currentMoveVars.groundedTimeToStop : currentMoveVars.airborneTimeToStop;
 
         // =============================
-        // ========== Running ==========
+        // ========== RUNNING ==========
         // =============================
 
         // IF there is any running input...
@@ -225,7 +229,7 @@ public class PlayerMover : MonoBehaviour
         }
 
         // =============================
-        // ========== Jumping ==========
+        // ========== JUMPING ==========
         // =============================
 
         // IF there is jump input AND it's new input AND the player can still jump...
@@ -264,7 +268,7 @@ public class PlayerMover : MonoBehaviour
         }
 
         // =====================================
-        // ========== Waving The Wand ==========
+        // ========== WAVING THE WAND ==========
         // =====================================
 
         // Setting the Wand spawn location
@@ -338,7 +342,7 @@ public class PlayerMover : MonoBehaviour
     }
 
     /// <summary>
-    /// GroundPlayer()
+    /// Turns on ground-based movement for the player (based on the passed-in closest collision point)
     /// </summary>
     private void GroundPlayer(Vector3 closestPoint)
     {
@@ -358,7 +362,7 @@ public class PlayerMover : MonoBehaviour
     }
 
     /// <summary>
-    /// Kill the player
+    /// Kills the player
     /// </summary>
     private void KillPlayer()
     {
@@ -395,7 +399,7 @@ public class PlayerMover : MonoBehaviour
     }
 
     /// <summary>
-    /// Changes the checkpoint
+    /// Changes the checkpoint to the passed-in Checkpoint prefab transform
     /// </summary>
     private void ChangeCheckpoint(Transform checkpoint)
     {
@@ -418,7 +422,7 @@ public class PlayerMover : MonoBehaviour
     }
 
     /// <summary>
-    /// 
+    /// Processing the passed-in 2D box collider as a platform
     /// </summary>
     private void ProcessAsPlatform(BoxCollider2D platform, bool fromEnterFunc)
     {
@@ -444,7 +448,7 @@ public class PlayerMover : MonoBehaviour
     }
 
     /// <summary>
-    /// 
+    /// Releasing the player from the current platform they are on
     /// </summary>
     private void ReleaseFromPlatform()
     {

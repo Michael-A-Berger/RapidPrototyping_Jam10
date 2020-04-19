@@ -8,6 +8,7 @@ public class PauseMenu : MonoBehaviour
     public GameObject menuPanel;
     public PlayerMover player;
     private bool isPaused;
+    private float lastCancel = 0;
 
     void Start()
     {
@@ -15,7 +16,8 @@ public class PauseMenu : MonoBehaviour
         isPaused = false;
     }
     private void Update() {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        float currentCancel = Input.GetAxisRaw("Cancel");
+        if (currentCancel > 0 && currentCancel != lastCancel)
         {
             if(menuPanel.activeSelf)
             {
@@ -26,6 +28,7 @@ public class PauseMenu : MonoBehaviour
                 PauseGame();
             }
         }
+        lastCancel = currentCancel;
     }
     public void MainMenu()
     {
