@@ -510,6 +510,13 @@ public class PlayerMover : MonoBehaviour
         {
             ChangeCheckpoint(other.gameObject.transform.parent);
         }
+
+        // IF the other collider is the goal...
+        if (other.gameObject.tag == "Finish")
+        {
+            // Disabling input
+            inputEnabled = false;
+        }
     }
 
     /// <summary>

@@ -23,4 +23,13 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Outro.unity
     guid: 66224ad99de281344844dd0fc440eb62
+  - enabled: 1
+    path: Assets/Scenes/berger_levels/berger_02.unity
+    guid: dc682e8ff285c424f9ec435c4ea5cd98
+  - enabled: 1
+    path: Assets/Scenes/berger_levels/berger_03.unity
+    guid: 767d5efe70bad074897effafeab01f95
+  - enabled: 1
+    path: Assets/Scenes/berger_levels/berger_01.unity
+    guid: 49a8c1bd6a032184a832fade3d60da2e
   m_configObjects: {}
