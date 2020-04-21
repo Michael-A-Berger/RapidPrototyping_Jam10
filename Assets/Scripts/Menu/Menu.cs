@@ -19,4 +19,9 @@ public class Menu : MonoBehaviour
     {
         Application.Quit();
     }
+
+    public void ControlConfig()
+    {
+        SceneManager.LoadScene("ControlConfig", LoadSceneMode.Single);
+    }
 }
