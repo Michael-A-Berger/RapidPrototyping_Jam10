@@ -18,7 +18,7 @@ public class Intro : MonoBehaviour
     }
     public void LevelOne()
     {
-        StartCoroutine(DelayedLoad("LevelOneD", 0.5f));
+        StartCoroutine(DelayedLoad("berger_02", 0.5f));
     }
     public void NextLine()
     {

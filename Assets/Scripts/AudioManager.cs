@@ -115,6 +115,13 @@ public class AudioManager : MonoBehaviour
 
         return isPlaying;
     }
+
+    // SetVolume()
+    public void ResetVolume(float percentage)
+    {
+        foreach (AudioContainer container in audioSources)
+            container.source.volume = container.volume * (percentage / 100);
+    }
 }
 
 [System.Serializable]

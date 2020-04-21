@@ -466,7 +466,7 @@ public class PlayerMover : MonoBehaviour
         // IF the checkpoint can be updated...
         if (canUpdate)
         {
-            // Playing the checkpoint particles + Setting the checkpoint transform
+            // Playing the checkpoint particles + Setting the checkpoint transform + Playing the checkpoint sound
             if (checkpointParticles.isPlaying)
             {
                 checkpointParticles.Stop();
@@ -474,6 +474,7 @@ public class PlayerMover : MonoBehaviour
             }
             checkpointParticles.Play();
             currentCheckpoint = checkpoint;
+            audioMng.PlayAudio("Player Respawn");
         }
     }
 
@@ -562,8 +563,9 @@ public class PlayerMover : MonoBehaviour
             // Disabling input
             inputEnabled = false;
 
-            // Playing the Level Complete audio
+            // Playing the Level Complete audio + Stopping the background music
             audioMng.PlayAudio("Level Complete");
+            audioMng.StopAudio("Nowhere Land");
         }
     }
 
