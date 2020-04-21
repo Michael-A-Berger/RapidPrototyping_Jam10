@@ -7,12 +7,12 @@ public class Menu : MonoBehaviour
 {
     public void Play()
     {
-        SceneManager.LoadScene("Intro", LoadSceneMode.Single);
+        StartCoroutine(DelayedLoad("Intro", 0.5f));
     }
 
     public void Credits()
     {
-        SceneManager.LoadScene("Credits", LoadSceneMode.Single);
+        StartCoroutine(DelayedLoad("Credits", 0.5f));
     }
 
     public void Quit()
@@ -22,6 +22,12 @@ public class Menu : MonoBehaviour
 
     public void ControlConfig()
     {
-        SceneManager.LoadScene("ControlConfig", LoadSceneMode.Single);
+        StartCoroutine(DelayedLoad("ControlConfig", 0.5f));
+    }
+
+    public IEnumerator DelayedLoad(string scene, float delayTime)
+    {
+        yield return new WaitForSeconds(delayTime);
+        SceneManager.LoadScene(scene, LoadSceneMode.Single);
     }
 }

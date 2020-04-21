@@ -5,24 +5,41 @@ using UnityEngine;
 public class AudioManager : MonoBehaviour
 {
     // Public Properties
+    [Header("General Variables")]
+    public string clipToPlayOnAwake = string.Empty;
+    [Header("Audio Clips")]
+    [Space(10)]
     public List<AudioContainer> audioSources;
 
     // Private Properties
     private Dictionary<string, int> listCipher = new Dictionary<string, int>();
 
-    // Start is called before the first frame update
+
+    // Awake()
+    private void Awake()
+    {
+        AudioManager mainMng = this;
+        AudioManager[] managerArray = FindObjectsOfType<AudioManager>();
+        if (managerArray.Length > 1)
+        {
+            foreach (AudioManager mng in managerArray)
+                if (mng.gameObject.GetInstanceID() != gameObject.GetInstanceID())
+                    mainMng = mng;
+            foreach (AudioContainer container in audioSources)
+                StartCoroutine(mainMng.DelayedStop(container.name));
+        }
+        else
+        {
+            DontDestroyOnLoad(gameObject);
+        }
+
+        if (clipToPlayOnAwake != string.Empty)
+            StartCoroutine(mainMng.DelayedPlay(clipToPlayOnAwake));
+    }
+
+    // Start()
     void Start()
     {
-        // foreach (AudioContainer container in audioSources)
-        // {
-        //     container.source = gameObject.AddComponent<AudioSource>();
-        //     container.source.clip = container.clip;
-        //     container.source.volume = container.volume;
-        //     container.source.loop = container.repeating;
-        //     if (container.startOnSceneLoad)
-        //         container.source.Play();
-        // }
-
         for (int num = 0; num < audioSources.Count; num++)
         {
             audioSources[num].source = gameObject.AddComponent<AudioSource>();
@@ -36,11 +53,23 @@ public class AudioManager : MonoBehaviour
         }
     }
 
+    // DelayedPlay()
+    public IEnumerator DelayedPlay(string audioName)
+    {
+        yield return new WaitForEndOfFrame();
+        PlayAudio(audioName);
+    }
+
+    // DelayedStop()
+    public IEnumerator DelayedStop(string audioName)
+    {
+        yield return new WaitForEndOfFrame();
+        StopAudio(audioName);
+    }
+
     // PlayAudio()
     public void PlayAudio(string audioName)
     {
-        // bool audioFound = false;
-
         if (!listCipher.ContainsKey(audioName))
         {
             Debug.LogError("\t[ AudioManager ] could not find container with name \"" + audioName + "\" !");
@@ -52,27 +81,11 @@ public class AudioManager : MonoBehaviour
                 audioSources[index].source.Stop();
             audioSources[index].source.Play();
         }
-        // for (int num = 0; num < audioSources.Count; num++)
-        // {
-        //     if (audioName == audioSources[num].name)
-        //     {
-        //         if (audioSources[num].source.isPlaying)
-        //             audioSources[num].source.Stop();
-        //         audioSources[num].source.Play();
-        //         num = audioSources.Count;
-        //         audioFound = true;
-        //     }
-        // }
-        // 
-        // if (!audioFound)
-        //     Debug.LogError("\t[ AudioManager ] could not find container with name \"" + audioName + "\" !");
     }
 
     // StopAudio()
     public void StopAudio(string audioName)
     {
-        // bool audioFound = false;
-
         if (!listCipher.ContainsKey(audioName))
         {
             Debug.LogError("\t[ AudioManager ] could not find container with name \"" + audioName + "\" !");
@@ -83,20 +96,6 @@ public class AudioManager : MonoBehaviour
             if (audioSources[index].source.isPlaying)
                 audioSources[index].source.Stop();
         }
-
-        // for (int num = 0; num < audioSources.Count; num++)
-        // {
-        //     if (audioName == audioSources[num].name)
-        //     {
-        //         if (audioSources[num].source.isPlaying)
-        //             audioSources[num].source.Stop();
-        //         audioFound = true;
-        //         num = audioSources.Count;
-        //     }
-        // }
-        // 
-        // if (!audioFound)
-        //     Debug.LogError("\t[ AudioManager ] could not find container with name \"" + audioName + "\" !");
     }
 
     // IsPlaying()
@@ -113,20 +112,6 @@ public class AudioManager : MonoBehaviour
             int index = listCipher[audioName];
             isPlaying = audioSources[index].source.isPlaying;
         }
-
-        // bool audioFound = false;
-        // for (int num = 0; num < audioSources.Count; num++)
-        // {
-        //     if (audioName == audioSources[num].name)
-        //     {
-        //         isPlaying = audioSources[num].source.isPlaying;
-        //         audioFound = true;
-        //         num = audioSources.Count;
-        //     }
-        // }
-        // 
-        // if (!audioFound)
-        //     Debug.LogError("\t[ AudioManager ] could not find container with name \"" + audioName + "\" !");
 
         return isPlaying;
     }

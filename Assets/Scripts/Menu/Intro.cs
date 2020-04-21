@@ -18,7 +18,7 @@ public class Intro : MonoBehaviour
     }
     public void LevelOne()
     {
-        SceneManager.LoadScene("LevelOneD", LoadSceneMode.Single);
+        StartCoroutine(DelayedLoad("LevelOneD", 0.5f));
     }
     public void NextLine()
     {
@@ -39,7 +39,13 @@ public class Intro : MonoBehaviour
 
     public void Menu() 
     {
-        SceneManager.LoadScene("Menu", LoadSceneMode.Single);
+        StartCoroutine(DelayedLoad("Menu", 0.5f));
+    }
+
+    public IEnumerator DelayedLoad(string scene, float delayTime)
+    {
+        yield return new WaitForSeconds(delayTime);
+        SceneManager.LoadScene(scene, LoadSceneMode.Single);
     }
 
 }

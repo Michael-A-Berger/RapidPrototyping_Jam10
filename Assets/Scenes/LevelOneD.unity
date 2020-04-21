@@ -11634,7 +11634,7 @@ PrefabInstance:
     - target: {fileID: 2320152832852947552, guid: 287e3b89496190044a0dd8622ece763d,
         type: 3}
       propertyPath: debug
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2320152832852947552, guid: 287e3b89496190044a0dd8622ece763d,
         type: 3}
@@ -87271,6 +87271,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8312356648855184371, guid: 5d29d41891b8e624ba33b42b9f84754b,
+        type: 3}
+      propertyPath: clipToPlayOnAwake
+      value: Nowhere Land
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5d29d41891b8e624ba33b42b9f84754b, type: 3}

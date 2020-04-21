@@ -501,8 +501,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8312356648855184371, guid: 5d29d41891b8e624ba33b42b9f84754b,
+        type: 3}
+      propertyPath: clipToPlayOnAwake
+      value: Music for Manatees
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5d29d41891b8e624ba33b42b9f84754b, type: 3}
+--- !u!114 &677295128 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8312356648855184371, guid: 5d29d41891b8e624ba33b42b9f84754b,
+    type: 3}
+  m_PrefabInstance: {fileID: 677295127}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3261a42c72114b54ea3986eb96dfcf0f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &715085875
 GameObject:
   m_ObjectHideFlags: 0
@@ -594,6 +611,17 @@ MonoBehaviour:
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 677295128}
+        m_MethodName: PlayAudio
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: Menu Click
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &715085878
@@ -725,6 +753,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 677295128}
+        m_MethodName: PlayAudio
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: Menu Click
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &757104921
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -852,6 +891,17 @@ MonoBehaviour:
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 677295128}
+        m_MethodName: PlayAudio
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: Menu Click
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &959707879
