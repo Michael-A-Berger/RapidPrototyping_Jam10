@@ -14,4 +14,9 @@ public class Credits : MonoBehaviour
     {
         Application.OpenURL("https://opengameart.org/content/dawnlike-16x16-universal-rogue-like-tileset-v181");
     }
+
+    public void resources_SmallTypeWriting()
+    {
+        Application.OpenURL("https://www.1001freefonts.com/small-type-writing.font");
+    }
 }
