@@ -189,7 +189,8 @@ MonoBehaviour:
   currentCheckpoint: {fileID: 0}
   deathParticles: {fileID: 5861428224756774843}
   checkpointParticles: {fileID: 5572822530020414640}
-  respawnTime: 2
+  deathRespawnTime: 2
+  forceRespawnTime: 1
   debug: 0
   debugPrefab1: {fileID: 7680461834242237159, guid: 5b5d4cda094038f4499a8d90e215a855,
     type: 3}
@@ -208,6 +209,12 @@ MonoBehaviour:
     jumpVelocity: 15
     midairJumps: 1
     gravity: 3
+    jumpSound: Normal - Jump
+    midairJumpSound: Normal - Midair Jump
+    landingSound: Normal - Landing
+    runningSound: Normal - Running
+    settingsAppliedSound: 
+    settingsRemovedSound: 
   - name: Water
     maxHorizontalVelocity: 40
     maxVerticalVelocity: 40
@@ -220,6 +227,12 @@ MonoBehaviour:
     jumpVelocity: 8
     midairJumps: 4294967294
     gravity: 0.5
+    jumpSound: Water - Jump
+    midairJumpSound: Water - Jump
+    landingSound: Water - Landing
+    runningSound: Water - Running
+    settingsAppliedSound: Water - Enter
+    settingsRemovedSound: Water - Exit
 --- !u!114 &2320152832852947553
 MonoBehaviour:
   m_ObjectHideFlags: 0
