@@ -404,7 +404,7 @@ public class PlayerMover : MonoBehaviour
         inputEnabled = true;
 
         // Changing the current position to the checkpoint
-        rigid.MovePosition(currentCheckpoint.position);
+        transform.position = currentCheckpoint.position;
     }
 
     /// <summary>
@@ -412,13 +412,26 @@ public class PlayerMover : MonoBehaviour
     /// </summary>
     private void ChangeCheckpoint(Transform checkpoint)
     {
-        // IF the new checkpoint is NOT the starting checkpoint...
-        if (checkpoint.gameObject.name != currentCheckpoint.gameObject.name)
-        {
-            // Stopping the current checkpoint particles
-            ParticleSystem oldParticles = currentCheckpoint.gameObject.GetComponentInChildren<ParticleSystem>();
-            oldParticles.gameObject.SetActive(false);
+        // Defining the update checkpoint boolean
+        bool canUpdate = true;
 
+        // IF the current checkpoint is defined...
+        if (currentCheckpoint != null)
+        {
+            // IF the current checkpoint and the new checkpoint are the same, then don't update the current checkpoint
+            canUpdate = (checkpoint.gameObject.name != currentCheckpoint.gameObject.name);
+
+            // IF the checkpoint can be updated, stop the old checkpoint particles
+            if (canUpdate)
+            {
+                ParticleSystem oldParticles = currentCheckpoint.gameObject.GetComponentInChildren<ParticleSystem>();
+                oldParticles.gameObject.SetActive(false);
+            }
+        }
+
+        // IF the checkpoint can be updated...
+        if (canUpdate)
+        {
             // Playing the checkpoint particles + Setting the checkpoint transform
             if (checkpointParticles.isPlaying)
             {
@@ -496,6 +509,13 @@ public class PlayerMover : MonoBehaviour
         if (other.gameObject.tag == "Checkpoint Trigger")
         {
             ChangeCheckpoint(other.gameObject.transform.parent);
+        }
+
+        // IF the other collider is the goal...
+        if (other.gameObject.tag == "Finish")
+        {
+            // Disabling input
+            inputEnabled = false;
         }
     }
 
