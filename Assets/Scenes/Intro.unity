@@ -271,7 +271,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: But she felt rather lethargic about this one
+  m_Text: But today she felt rather lethargic.
 --- !u!222 &175466780
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -348,8 +348,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "Jacques \u201CJack\u201D Purgatorum\n\nIs a Wizard working in a magical
-    library"
+  m_Text: "Jacques \u201CJack\u201D Purgatorum\nis a Wizard working in a magical library."
 --- !u!222 &220234967
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -725,7 +724,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\rHowever, Arcane Magic is not easily accessible.\r\n"
+  m_Text: "\rHowever, the book on Arcane Magic was not easily accessible.\r\n"
 --- !u!222 &644844796
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1254,8 +1253,8 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "Normally,Alexis Dharma,another wizard,\r\n\nretrieves book requests for
-    library members."
+  m_Text: "Normally, Alexis Dharma, another wizard and Jack's friend,\r retrieves
+    book requests for library members."
 --- !u!222 &1245100994
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1332,10 +1331,8 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Jack,as a friend of Alexis,
-
-
-    has volunteered to retrieve the book...'
+  m_Text: Jack, as good a friend of Alexis, has volunteered to retrieve the book in
+    her place...
 --- !u!222 &1295616345
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1344,6 +1341,75 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1295616342}
   m_CullTransparentMesh: 0
+--- !u!1001 &1324089799
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 8312356648855184368, guid: 5d29d41891b8e624ba33b42b9f84754b,
+        type: 3}
+      propertyPath: m_Name
+      value: Audio Manager
+      objectReference: {fileID: 0}
+    - target: {fileID: 8312356648855184370, guid: 5d29d41891b8e624ba33b42b9f84754b,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8312356648855184370, guid: 5d29d41891b8e624ba33b42b9f84754b,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8312356648855184370, guid: 5d29d41891b8e624ba33b42b9f84754b,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8312356648855184370, guid: 5d29d41891b8e624ba33b42b9f84754b,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8312356648855184370, guid: 5d29d41891b8e624ba33b42b9f84754b,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8312356648855184370, guid: 5d29d41891b8e624ba33b42b9f84754b,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8312356648855184370, guid: 5d29d41891b8e624ba33b42b9f84754b,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8312356648855184370, guid: 5d29d41891b8e624ba33b42b9f84754b,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8312356648855184370, guid: 5d29d41891b8e624ba33b42b9f84754b,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8312356648855184370, guid: 5d29d41891b8e624ba33b42b9f84754b,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8312356648855184370, guid: 5d29d41891b8e624ba33b42b9f84754b,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 5d29d41891b8e624ba33b42b9f84754b, type: 3}
 --- !u!1 &1340864181
 GameObject:
   m_ObjectHideFlags: 0
@@ -1939,7 +2005,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "One day, Kim Baalberith, a library member, \r\n\nasked to rent out a book
+  m_Text: "One day, Kim Baalberith, a library member, \r\nasked to rent out a book
     about Arcane Magic."
 --- !u!222 &2062784816
 CanvasRenderer:
