@@ -16,9 +16,9 @@ public class Intro : MonoBehaviour
         CurrentText = TextSeries.transform.Find(CurrentName).gameObject;
         CurrentText.SetActive(true);
     }
-    public void Continue()
+    public void LevelOne()
     {
-        SceneManager.LoadScene("LevelOne", LoadSceneMode.Single);
+        SceneManager.LoadScene("LevelOneD", LoadSceneMode.Single);
     }
     public void NextLine()
     {
@@ -39,7 +39,7 @@ public class Intro : MonoBehaviour
 
     public void Menu() 
     {
-        SceneManager.LoadScene("Scenes/Menu", LoadSceneMode.Single);
+        SceneManager.LoadScene("Menu", LoadSceneMode.Single);
     }
 
 }

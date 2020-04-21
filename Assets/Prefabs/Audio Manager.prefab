@@ -94,7 +94,7 @@ MonoBehaviour:
     source: {fileID: 0}
   - name: Moving Platform
     clip: {fileID: 8300000, guid: ba252d98fa5b0fd40accdf6db7ec9b9c, type: 3}
-    volume: 1
+    volume: 0.5
     repeating: 0
     startOnSceneLoad: 0
     source: {fileID: 0}
