@@ -7,7 +7,7 @@ public class Credits : MonoBehaviour
 {
     public void back()
     {
-        SceneManager.LoadScene("Menu");
+        StartCoroutine(DelayedLoad("Menu", 0.5f));
     }
 
     public void resources_DawnLike()
@@ -18,5 +18,16 @@ public class Credits : MonoBehaviour
     public void resources_SmallTypeWriting()
     {
         Application.OpenURL("https://www.1001freefonts.com/small-type-writing.font");
+    }
+
+    public void resources_AllAudio()
+    {
+        Application.OpenURL("https://docs.google.com/document/d/1XGTAHmtngpTrt33yet_OhuqyoXbZzDjPeKbCTFqWsEs/");
+    }
+
+    public IEnumerator DelayedLoad(string scene, float delayTime)
+    {
+        yield return new WaitForSeconds(delayTime);
+        SceneManager.LoadScene(scene, LoadSceneMode.Single);
     }
 }

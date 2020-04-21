@@ -43,6 +43,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3261a42c72114b54ea3986eb96dfcf0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  clipToPlayOnAwake: 
   audioSources:
   - name: Music for Manatees
     clip: {fileID: 8300000, guid: 99a0132e9433fd245a35a3710b0e9e81, type: 3}
