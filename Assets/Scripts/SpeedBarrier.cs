@@ -16,6 +16,9 @@ public class SpeedBarrier : MonoBehaviour
     [Header("Debug Variables")]
     public bool debug = false;
 
+    // Private Properties
+    private AudioManager audioMng;
+
     /// <summary>
     /// 
     /// </summary>
@@ -25,6 +28,11 @@ public class SpeedBarrier : MonoBehaviour
         sprite = GetComponent<SpriteRenderer>();
         barrierCollider = GetComponent<BoxCollider2D>();
         breakParticles = GetComponent<ParticleSystem>();
+
+        // Getting the Audio Manager (and complaining if it can't find one)
+        audioMng = FindObjectOfType<AudioManager>();
+        if (audioMng == null)
+            Debug.LogError("\tNo GameObject with the [ AudioManager ] script was found in the current scene!");
 
         // Updating the size of the barrier
         UpdateObjectSize();
@@ -53,6 +61,9 @@ public class SpeedBarrier : MonoBehaviour
         // Disabling the main sprite + box collider
         sprite.enabled = false;
         barrierCollider.enabled = false;
+
+        // Playing the speed barrier break audio
+        audioMng.PlayAudio("Speed Barrier Break");
         
         // Playing the break particles
         breakParticles.Play();

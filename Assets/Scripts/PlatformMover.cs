@@ -12,6 +12,7 @@ public class PlatformMover : MonoBehaviour
     public List<MoveItem> moveItems = new List<MoveItem>();
 
     // Private Properties
+    private AudioManager audioMng = null;
     private Rigidbody2D rigid;
     private Vector3 startPos = Vector3.zero;
     private int index = 0;
@@ -27,6 +28,11 @@ public class PlatformMover : MonoBehaviour
 
         // Getting the rigidbody
         rigid = GetComponent<Rigidbody2D>();
+
+        // Getting the Audio Manager (and complaining if it can't find one)
+        audioMng = FindObjectOfType<AudioManager>();
+        if (audioMng == null)
+            Debug.LogError("\tNo GameObject with the [ AudioManager ] script was found in the current scene!");
 
         // IF the mover should start moving when the scene starts, set the moving variable to true
         if (awakeOnStart)
@@ -90,6 +96,9 @@ public class PlatformMover : MonoBehaviour
 
                 // Setting the destination to the next position
                 SetDestination(moveItems[index]);
+
+                // Playing the moving platform audio
+                audioMng.PlayAudio("Moving Platform");
             }
             // ELSE... (the game object position is not at its destination...
             else
