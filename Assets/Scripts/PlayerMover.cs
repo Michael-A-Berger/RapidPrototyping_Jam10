@@ -23,6 +23,7 @@ public class PlayerMover : MonoBehaviour
     public List<PlayerMovementSettings> movementVars = new List<PlayerMovementSettings>();
 
     // Private Properties (General)
+    private AudioManager audioMng;
     private PlayerMovementSettings currentMoveVars;
     private SpriteRenderer playerSprite;
     private Rigidbody2D rigid;
@@ -54,12 +55,15 @@ public class PlayerMover : MonoBehaviour
     /// </summary>
     void Start()
     {
+        audioMng = FindObjectOfType<AudioManager>();
         playerSprite = GetComponent<SpriteRenderer>();
         rigid = GetComponent<Rigidbody2D>();
         capsuleCollider = GetComponent<CapsuleCollider2D>();
         boxTrigger = GetComponent<BoxCollider2D>();
 
         // Initialization Warnings
+        if (audioMng == null)
+            Debug.LogError("\tNo GameObject with the [ AudioManager ] script was found in the current scene!");
         if (currentCheckpoint == null)
             Debug.LogError("\t[ currentCheckpoint ] of [ PlayerMover.cs ] script not set!");
 
@@ -233,13 +237,36 @@ public class PlayerMover : MonoBehaviour
             }
         }
 
+        // IF the current running sound is defined...
+        if (currentMoveVars.runningSound != string.Empty)
+        {
+            // IF there is horizontal input AND the player is grounded AND the running sound is not playing, start playing the sound
+            if (currentAxisX != 0.0f && grounded && !audioMng.IsPlaying(currentMoveVars.runningSound))
+                audioMng.PlayAudio(currentMoveVars.runningSound);
+
+            // IF (there is no horizontal input OR the player is not grouned) AND the running sound is playing...
+            if ((currentAxisX == 0.0f || !grounded) && audioMng.IsPlaying(currentMoveVars.runningSound))
+                audioMng.StopAudio(currentMoveVars.runningSound);
+        }
+
         // =============================
         // ========== JUMPING ==========
         // =============================
 
+        // 
+
         // IF there is jump input AND it's new input AND the player can still jump...
         if (currentAxisY > 0f && currentAxisY != lastAxisY && (jumpCounter < currentMoveVars.midairJumps + 1))
         {
+            // IF the current jumping sound is defined AND the player is grounded, play the basic jump sound
+            if (currentMoveVars.jumpSound != string.Empty && grounded)
+                audioMng.PlayAudio(currentMoveVars.jumpSound);
+
+            // IF the current midair jumping sound is defined AND the player is not grounded...
+            if (currentMoveVars.midairJumpSound != string.Empty && !grounded)
+                audioMng.PlayAudio(currentMoveVars.midairJumpSound);
+
+            // Setting all of the proper jumping variables (velocity, grounded, and jump counter vars)
             rigid.velocity = new Vector2(rigid.velocity.x, currentMoveVars.jumpVelocity);
             grounded = false;
             jumpCounter++;
@@ -312,8 +339,13 @@ public class PlayerMover : MonoBehaviour
             // IF the Wand has been hooked...
             if (wandScript.IsHooked())
             {
+                // Add the hook speed to the player's velocity
                 Vector2 modVector = wandSpawnLocation * currentMoveVars.hookSpeed * Time.deltaTime * currentMoveVars.maxRunSpeed;
                 rigid.velocity += modVector;
+
+                // IF the lantern boost audio is not playing, then start playing it
+                if (!audioMng.IsPlaying("Lantern Boost"))
+                    audioMng.PlayAudio("Lantern Boost");
             }
         }
 
@@ -374,12 +406,13 @@ public class PlayerMover : MonoBehaviour
     /// </summary>
     private void KillPlayer()
     {
-        // "Killing" the player (Hide sprite, Set gravity + velocity + passive velocity to zero, Disable input)
+        // "Killing" the player (Hide sprite, Set gravity + velocity + passive velocity to zero, Disable input, Play death audio)
         playerSprite.enabled = false;
         rigid.gravityScale = 0f;
         rigid.velocity *= 0;
         passiveVelocity *= 0;
         inputEnabled = false;
+        audioMng.PlayAudio("Player Death");
 
         // Turning on the particles that play on death
         if (deathParticles.isPlaying)
@@ -398,10 +431,11 @@ public class PlayerMover : MonoBehaviour
         // Waiting for the designated amount of seconds
         yield return new WaitForSeconds(waitTime);
 
-        // "Respawning" the player (Show sprite, Enable gravity, Enable input)
+        // "Respawning" the player (Show sprite, Enable gravity, Enable input, Play respawn audio)
         playerSprite.enabled = true;
         rigid.gravityScale = currentMoveVars.gravity;
         inputEnabled = true;
+        audioMng.PlayAudio("Player Respawn");
 
         // Changing the current position to the checkpoint
         transform.position = currentCheckpoint.position;
@@ -453,7 +487,10 @@ public class PlayerMover : MonoBehaviour
 
         // IF the closest point is on the ground...
         if (closestPoint.y <= transform.position.y - boxTrigger.bounds.extents.y / 2)
+        {
+            // Grounding the player
             GroundPlayer(closestPoint);
+        }
 
         // IF the process was started from an "Enter" function AND debug is on, spawn the debug prefabs
         if (fromEnterFunc && debug)
@@ -493,6 +530,10 @@ public class PlayerMover : MonoBehaviour
 
             // Processing the platform as a proper platform
             ProcessAsPlatform(otherBox, true);
+
+            // Playing the landing audio clip (assuming it's defined)
+            if (currentMoveVars.landingSound != string.Empty && !audioMng.IsPlaying(currentMoveVars.landingSound))
+                audioMng.PlayAudio(currentMoveVars.landingSound);
         }
 
         // IF the other collider is Water...
@@ -503,6 +544,10 @@ public class PlayerMover : MonoBehaviour
 
             // Setting the water movement variables
             currentMoveVars = GetMovementVarsByName("Water");
+
+            // Playing the "Water Entered" audio (if it's defined)
+            if (currentMoveVars.settingsAppliedSound != string.Empty)
+                audioMng.PlayAudio(currentMoveVars.settingsAppliedSound);
         }
 
         // IF the other collider is a Checkpoint Trigger...
@@ -516,6 +561,9 @@ public class PlayerMover : MonoBehaviour
         {
             // Disabling input
             inputEnabled = false;
+
+            // Playing the Level Complete audio
+            audioMng.PlayAudio("Level Complete");
         }
     }
 
@@ -552,6 +600,10 @@ public class PlayerMover : MonoBehaviour
         // IF the other collider is Water...
         if (other.gameObject.tag == "Water")
         {
+            // Playing the "Water Exited" audio (assuming it's defined)
+            if (currentMoveVars.settingsRemovedSound != string.Empty)
+                audioMng.PlayAudio(currentMoveVars.settingsRemovedSound);
+
             // Resetting the normal movement variables
             ResetMovementVars();
 
@@ -594,6 +646,10 @@ public class PlayerMover : MonoBehaviour
                 // Process the speed barrier like any platform
                 BoxCollider2D otherBox = other.gameObject.GetComponent<BoxCollider2D>();
                 ProcessAsPlatform(otherBox, true);
+
+                // Playing the landing audio clip (assuming it's defined)
+                if (currentMoveVars.landingSound != string.Empty && !audioMng.IsPlaying(currentMoveVars.landingSound))
+                    audioMng.PlayAudio(currentMoveVars.landingSound);
             }
         }
 
@@ -609,6 +665,10 @@ public class PlayerMover : MonoBehaviour
 
             // Setting the player's passive velocity to the platform's velocity
             passiveVelocity = otherRigid.velocity;
+
+            // Playing the landing audio clip (assuming it's defined)
+            if (currentMoveVars.landingSound != string.Empty && !audioMng.IsPlaying(currentMoveVars.landingSound))
+                audioMng.PlayAudio(currentMoveVars.landingSound);
         }
     }
 
@@ -705,4 +765,13 @@ public class PlayerMovementSettings
     public uint midairJumps = 1;
     [Tooltip("What is the gravity scale of the Rigidbody?")]
     public float gravity = 3f;
+
+    [Header("Audio")]
+    [Space(10)]
+    public string jumpSound = string.Empty;
+    public string midairJumpSound = string.Empty;
+    public string landingSound = string.Empty;
+    public string runningSound = string.Empty;
+    public string settingsAppliedSound = string.Empty;
+    public string settingsRemovedSound = string.Empty;
 }
